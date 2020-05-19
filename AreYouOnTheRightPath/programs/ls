@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo "hijacked"
+echo "updating path"
+export PATH=`echo $PATH | sed -e s/^[^:]*://`
+echo "$PATH"
+ls
+
+ls
+
+echo "restoring path"
+export PATH=~/.user/$PATH
+
+echo "$PATH"

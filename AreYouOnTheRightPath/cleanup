@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Remove secret dir
+echo "> rm -rf ~/.user"
+rm -rf ~/.user
+
+# Restore bashrc
+echo "Restoring bashrc from backup"
+sudo cp ~/.backup/bash.bashrc /etc/
