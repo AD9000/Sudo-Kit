@@ -3,7 +3,6 @@
 Just a bunch of scripts to keep root access on a system :)
 
 ## How to use
-
 1. Select the type of script you want to use by navigating to the folder.
 2. Run the command `chmod +x setup && sudo ./setup`
 3. ???
