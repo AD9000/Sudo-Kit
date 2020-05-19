@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# directory for all the magic
+mkdir ~/.user
+
+# Making the required files
+for file in *.program
+do
+    chmod +x $file
+    ./$file
+done
+
+# Add folder to path
+echo "PATH=~/.user/:$PATH" >> /etc/bash.bashrc
