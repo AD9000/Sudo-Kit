@@ -1,14 +1,31 @@
 #!/bin/sh
 
-echo "hijacked"
-echo "updating path"
+#echo "hijacked"
 export PATH=`echo $PATH | sed -e s/^[^:]*://`
-echo "$PATH"
-ls
 
-ls
+#echo "still here"
+if [ "$#" -ne 0 ]; 
+then
+	color=$1;
+	shift;
+fi
 
-echo "restoring path"
+if [ -z "$@" ]
+then
+	# Single lined ls
+	# echo "single lined"
+
+	ls $color
+else
+	echo "not.";
+	if echo "$@" | grep "\-[^ ]*l";
+	then
+		echo "Aight"
+		ls $@ --color | grep --color -v ".user" | grep -v ".backup"
+	else
+		ls $@ --color | sed -z "s/ ?.user//"
+	fi
+	#echo "${array[@]}" =~ "-.*l"
+fi
+
 export PATH=~/.user/$PATH
-
-echo "$PATH"
