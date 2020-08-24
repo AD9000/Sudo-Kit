@@ -1,9 +1,19 @@
 #!/bin/sh
 
+secret="$HOME/.user"
+
 # Remove secret dir
-echo "> rm -rf ~/.user"
-rm -rf ~/.user
+echo "> rm -rf $secret"
+rm -rf "$secret"
 
 # Restore bashrc
 echo "Restoring bashrc from backup"
 sudo cp ~/.backup/bash.bashrc /etc/
+
+# Remove the secret dir from path
+uuid="`cat /proc/sys/kernel/random/uuid`"
+sudo grep -v "$secret" /etc/bash.bashrc > "/tmp/$uuid"
+sudo cp "/tmp/$uuid" /etc/bash.bashrc
+
+# Exporting OG path
+export PATH="`echo $PATH | sed "s!$secret:!!"`"

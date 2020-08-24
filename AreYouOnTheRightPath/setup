@@ -1,19 +1,17 @@
 #!/bin/sh
-secret=~/.user
-backup=~/.backup
+
+secret="$HOME/.user"
+backup="$HOME/.backup"
 
 if [ -e "$backup" ] 
 then
     echo "$backup exists"
 else
-    if [ mkdir "$backup" ] 2> /dev/null
-    then 
-        echo "made backup dir"
-    fi
+    mkdir "$backup" && echo "made backup dir"
 fi
 
 # copy over bashrc
-sudo cp /etc/bash.bashrc $backup/bash.bashrc
+sudo cp /etc/bash.bashrc "$backup/bash.bashrc"
 
 # make sure
 if [ $? -eq 0 ]; then
@@ -22,7 +20,6 @@ else
     echo "Backup could not be made. Exiting"
     exit 1
 fi
-
 
 # directory for all the magic
 if [ -e "$secret" ] 
@@ -46,6 +43,18 @@ do
     cp ./"$file" "$secret"/"$file"
 done
 
+# finding the user
+user="`whoami`"
+sudo chown -R "$user" "$secret"
+
 # Add folder to path
-echo "PATH=$secret:$PATH" >> /etc/bash.bashrc
+if [ -z "`echo $PATH | grep "$secret"`" ]; then
+    echo "export PATH=\"$secret:$PATH\"" | sudo tee -a /etc/bash.bashrc > /dev/null
+else
+    if [ -z "`sudo grep "$secret" /etc/bash.bashrc`" ]; then
+        echo "export PATH=\"$PATH\"" | sudo tee -a /etc/bash.bashrc > /dev/null
+    fi
+fi
+
+echo "Done. Open new shell to complete setup"
 
